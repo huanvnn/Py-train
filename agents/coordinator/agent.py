@@ -137,7 +137,10 @@ async def run_coordinator(prompt: str, knowledge_client=None, summary_client=Non
         except Exception as e:
             raw_answer = "General Knowledge specialist temporarily unavailable"
     else:
-        raw_answer = f"Resolved context: {context}"
+        raw_answer = context
+        # Preserve grounded answers and their citations without a second rewrite.
+        if "\n\nSources:\n" in context:
+            return {"result": context, "agents": participated_agents}
 
     # Format the final response via Summary Agent
     participated_agents.append("summary_agent")
