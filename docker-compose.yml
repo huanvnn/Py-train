@@ -1,0 +1,95 @@
+version: '3.8'
+
+networks:
+  ai-chat-network:
+    driver: bridge
+
+services:
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "127.0.0.1:${GATEWAY_PORT:-8000}:8000"
+    environment:
+      - CHAT_API_TOKEN=${CHAT_API_TOKEN:?Set CHAT_API_TOKEN in .env}
+      - ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+      - COORDINATOR_HOST=${COORDINATOR_HOST:-agent-coordinator}
+      - COORDINATOR_PORT=${COORDINATOR_PORT:-8001}
+    networks:
+      - ai-chat-network
+    depends_on:
+      - agent-coordinator
+
+  agent-coordinator:
+    build:
+      context: ./agents/coordinator
+      dockerfile: Dockerfile
+    container_name: agent-coordinator
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - KNOWLEDGE_HOST=${KNOWLEDGE_HOST:-agent-knowledge}
+      - KNOWLEDGE_PORT=${KNOWLEDGE_PORT:-8002}
+      - SUMMARY_HOST=${SUMMARY_HOST:-agent-summary}
+      - SUMMARY_PORT=${SUMMARY_PORT:-8003}
+      - GENERAL_KNOWLEDGE_HOST=${GENERAL_KNOWLEDGE_HOST:-agent-general-knowledge}
+      - GENERAL_KNOWLEDGE_PORT=${GENERAL_KNOWLEDGE_PORT:-8004}
+    networks:
+      - ai-chat-network
+    depends_on:
+      - agent-knowledge
+      - agent-summary
+      - agent-general-knowledge
+
+  agent-knowledge:
+    build:
+      context: ./agents/knowledge
+      dockerfile: Dockerfile
+    container_name: agent-knowledge
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - KNOWLEDGE_HOST=${KNOWLEDGE_HOST:-agent-knowledge}
+      - KNOWLEDGE_PORT=${KNOWLEDGE_PORT:-8002}
+    volumes:
+      - ./agents/knowledge/data:/app/data
+    networks:
+      - ai-chat-network
+
+  agent-summary:
+    build:
+      context: ./agents/summary
+      dockerfile: Dockerfile
+    container_name: agent-summary
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SUMMARY_HOST=${SUMMARY_HOST:-agent-summary}
+      - SUMMARY_PORT=${SUMMARY_PORT:-8003}
+    networks:
+      - ai-chat-network
+
+  agent-general-knowledge:
+    build:
+      context: ./agents/general_knowledge
+      dockerfile: Dockerfile
+    container_name: agent-general-knowledge
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GENERAL_KNOWLEDGE_HOST=${GENERAL_KNOWLEDGE_HOST:-agent-general-knowledge}
+      - GENERAL_KNOWLEDGE_PORT=${GENERAL_KNOWLEDGE_PORT:-8004}
+    networks:
+      - ai-chat-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
+    environment:
+      - VITE_GATEWAY_URL=http://localhost:${GATEWAY_PORT:-8000}
+    networks:
+      - ai-chat-network
+    depends_on:
+      - gateway

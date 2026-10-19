@@ -1,0 +1,20 @@
+/.env
+/.gemini
+/.specify
+/.vscode
+# Track ignore rules
+/agents/coordinator/.env
+/agents/general_knowledge/.env
+/agents/knowledge/.env
+/agents/summary/.env
+/agents/gateway/.env
+.venv/
+
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+node_modules/
+dist/
+.pytest_cache/

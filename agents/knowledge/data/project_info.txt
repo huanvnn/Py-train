@@ -1,0 +1,29 @@
+# AI Chat Demo Specifications
+
+## Project Purpose
+The AI Chat Demo is designed to demonstrate Agent-to-Agent (A2A) communication using the Google Agent Development Kit (ADK) and the A2A protocol.
+
+## System Architecture Details
+- **Architecture Model**: Multi-Agent Collaboration system.
+- **Frontend Client**: React + Vite application running on port 3000. It communicates solely with the Gateway API and cannot bypass it.
+- **Gateway API**: FastAPI web gateway running on port 8000. It handles user inputs and streams agent replies back to the client using Server-Sent Events (SSE).
+- **Coordinator Agent**: Orchestrator agent running Google ADK on port 8001. It parses requests and delegates sub-tasks to Specialist agents via A2A endpoints.
+- **Knowledge Agent**: Specialist agent running Google ADK on port 8002. It indexes and searches local documentation (e.g. data/project_info.txt) to return context facts.
+- **Summary Agent**: Specialist agent running Google ADK on port 8003. It summarizes conversations and transcripts.
+- **MCP Policy**: Model Context Protocol (MCP) integrations are strictly prohibited. Inter-agent interaction is restricted to A2A.
+- **Deployment**: Local orchestration is performed using Docker Compose.
+
+
+# Microservice Architecture
+
+Microservice architecture is a software design approach in which an application is composed of small, independent services.
+
+Benefits:
+- Independent deployment
+- Scalability
+- Fault isolation
+
+Challenges:
+- Distributed tracing
+- Service discovery
+- Data consistency

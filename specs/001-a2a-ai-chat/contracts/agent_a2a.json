@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "A2APayloadSchema",
+  "description": "Schema definitions for agent-to-agent exchanges and Discovery cards",
+  "definitions": {
+    "AgentCard": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "version": { "type": "string" },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "protocol": { "type": "string", "enum": ["a2a"] },
+              "url": { "type": "string", "format": "uri" }
+            },
+            "required": ["protocol", "url"]
+          }
+        },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "parameters": { "type": "object" }
+            },
+            "required": ["description", "parameters"]
+          }
+        }
+      },
+      "required": ["name", "description", "version", "endpoints", "capabilities"]
+    },
+    "TaskRequest": {
+      "type": "object",
+      "properties": {
+        "task_id": { "type": "string", "format": "uuid" },
+        "capability": { "type": "string" },
+        "parameters": { "type": "object" }
+      },
+      "required": ["task_id", "capability", "parameters"]
+    },
+    "TaskResponse": {
+      "type": "object",
+      "properties": {
+        "task_id": { "type": "string", "format": "uuid" },
+        "status": { "type": "string", "enum": ["success", "failure"] },
+        "result": { "type": "object" },
+        "error": { "type": "string" }
+      },
+      "required": ["task_id", "status"]
+    }
+  }
+}
