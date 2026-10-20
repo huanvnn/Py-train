@@ -10,3 +10,6 @@ __pycache__
 node_modules
 **/node_modules
 .pytest_cache
+
+.rag-cache
+**/.rag-cache

@@ -22,3 +22,6 @@ For a content problem, use Reset and stop the request. Report abuse to the deplo
 Every Docker build context excludes .env files, virtual environments, caches and Git metadata. Keep secrets in the local .env only. Never place a server secret in a VITE_ variable. The agent services have no published host ports, and the frontend and gateway bind only to 127.0.0.1.
 
 Personal metadata already in published commits remains in history. Removing it requires a separately coordinated history rewrite and force push. Changing the local Git email only affects future commits.
+
+## RAG documents and embedding cache
+All eligible text/Markdown in the knowledge data directory is sent to the Gemini embedding API during initial indexing; changed chunks are sent when the index refreshes. Selected chunks and the question are sent for grounded generation. Do not place secrets or private records in the corpus. Cached vectors are sensitive and stored in a separate local directory or Docker volume, excluded from Git and images. Deleting a chat does not delete document embeddings or provider-side data. See agents/knowledge/README.md for cache removal.

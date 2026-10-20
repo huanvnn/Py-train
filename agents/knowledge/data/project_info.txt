@@ -8,7 +8,7 @@ The AI Chat Demo is designed to demonstrate Agent-to-Agent (A2A) communication u
 - **Frontend Client**: React + Vite application running on port 3000. It communicates solely with the Gateway API and cannot bypass it.
 - **Gateway API**: FastAPI web gateway running on port 8000. It handles user inputs and streams agent replies back to the client using Server-Sent Events (SSE).
 - **Coordinator Agent**: Orchestrator agent running Google ADK on port 8001. It parses requests and delegates sub-tasks to Specialist agents via A2A endpoints.
-- **Knowledge Agent**: Specialist agent running Google ADK on port 8002. It indexes and searches local documentation (e.g. data/project_info.txt) to return context facts.
+- **Knowledge Agent**: Specialist agent running Google ADK on port 8002. It splits local text/Markdown into overlapping chunks, embeds them with Gemini, retrieves semantically relevant evidence and produces grounded answers with source citations.
 - **Summary Agent**: Specialist agent running Google ADK on port 8003. It summarizes conversations and transcripts.
 - **MCP Policy**: Model Context Protocol (MCP) integrations are strictly prohibited. Inter-agent interaction is restricted to A2A.
 - **Deployment**: Local orchestration is performed using Docker Compose.
@@ -27,3 +27,12 @@ Challenges:
 - Distributed tracing
 - Service discovery
 - Data consistency
+## Knowledge Retrieval Pipeline
+The Knowledge Agent reads UTF-8 text and Markdown files from its data directory.
+Documents are split at headings and paragraph boundaries into windows of up to 1200 characters with 200 characters of overlap.
+Each chunk records its source file, heading and original line range.
+Gemini document embeddings are normalized and cached persistently in SQLite.
+Questions use query embeddings to retrieve up to four chunks by cosine similarity.
+Only sufficiently relevant evidence is supplied to the answer model, and answers include numbered citations and file/line references.
+If no relevant evidence is found, the Knowledge Agent returns a structured not_found result and the Coordinator can fall back to the General Knowledge Agent.
+The Coordinator preserves grounded Knowledge answers without rewriting their citations through the Summary Agent.

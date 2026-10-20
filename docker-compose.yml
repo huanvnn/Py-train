@@ -51,8 +51,15 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - KNOWLEDGE_HOST=${KNOWLEDGE_HOST:-agent-knowledge}
       - KNOWLEDGE_PORT=${KNOWLEDGE_PORT:-8002}
+      - RAG_CACHE_PATH=/app/.rag-cache/vectors.sqlite3
+      - RAG_GENERATION_MODEL=${RAG_GENERATION_MODEL:-gemini-2.5-flash}
+      - RAG_CHUNK_SIZE=${RAG_CHUNK_SIZE:-1200}
+      - RAG_CHUNK_OVERLAP=${RAG_CHUNK_OVERLAP:-200}
+      - RAG_TOP_K=${RAG_TOP_K:-4}
+      - RAG_MIN_SCORE=${RAG_MIN_SCORE:-0.45}
     volumes:
-      - ./agents/knowledge/data:/app/data
+      - ./agents/knowledge/data:/app/data:ro
+      - knowledge-rag-cache:/app/.rag-cache
     networks:
       - ai-chat-network
 
@@ -93,3 +100,6 @@ services:
       - ai-chat-network
     depends_on:
       - gateway
+
+volumes:
+  knowledge-rag-cache:

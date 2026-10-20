@@ -79,3 +79,6 @@ Only frontend and gateway ports are published, bound to localhost. Specialist UR
 The gateway accepts at most 20 chat requests/minute, 8 concurrent replies, 8,000 characters per prompt, and 32 KiB per request body. Run one gateway worker. See [Safety and privacy](SECURITY.md) for retention, acceptable use and reporting.
 
 Run gateway regression tests from gateway: `python -m pytest -q` after installing requirements.txt.
+
+## Knowledge RAG
+The Knowledge Agent now chunks UTF-8 text/Markdown documents, caches Gemini embeddings in SQLite, retrieves semantic top-k evidence and generates answers with file/line citations. See [Knowledge Agent RAG](agents/knowledge/README.md) for indexing, settings and tests.
